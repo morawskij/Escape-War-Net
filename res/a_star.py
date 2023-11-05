@@ -1,6 +1,27 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from queue import PriorityQueue
 import math
+
+
+
+##Importing data from satellite pictures analysis
+data = np.load('/home/adrian/hackathon/Escape-War-Net/res/heatmap_2023-10-07.npy')
+print(data)
+
+def foo(x):
+    if x<0.5:
+        return 1
+    return 0
+n = len(data)
+m= len(data[0])
+
+#data_processed = [[foo(data[i][j]) for i in range(n)] for j in range(m)]
+#print(data_processed)
+print(f'n: {n},m:{m}')
+
+
+
 
 directions = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1))
 
@@ -23,10 +44,10 @@ class Grid:
     def __init__(self):
         #exmple setup.
         self.coordinate_min_x=0
-        self.coordinate_max_x=24
+        self.coordinate_max_x=n-1
         self.coordinate_min_y=0
-        self.coordinate_max_y=15
-        self.node_size = 0.5   
+        self.coordinate_max_y=m-1
+        self.node_size = 1
 
 
         self.coordinate_size_y = self.coordinate_max_y-self.coordinate_min_y
@@ -38,7 +59,7 @@ class Grid:
         self.matrix = [[None for _ in range(self.size_y)] for _ in range(self.size_x)]
         for i in range (self.size_x):
             for j in range (self.size_y):
-                self.matrix[i][j]=Node(self.coordinate_min_x+i*self.node_size,self.coordinate_min_y+j*self.node_size)
+                self.matrix[i][j]=Node(self.coordinate_min_x+i*self.node_size,self.coordinate_min_y+j*self.node_size,foo(data[i][j]))
         
     def visualize(self):
         for i in range(self.size_x):
@@ -139,8 +160,11 @@ def visualize_path(grid, path):
 
 grid = Grid()
 
-start = grid.matrix[12][10]
-end = grid.matrix[42][26]
+#start = grid.matrix[12][10]
+#end = grid.matrix[42][26]
+
+start = grid.matrix[0][0]
+end = grid.matrix[3][3]
 
 path = grid.search(start, end)
 if path:
