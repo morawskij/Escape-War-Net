@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="fragment1_color">#131946</color>
+    <color name="fragment2_color">#511576</color>
+    <color name="mainText_color">#E4E9A9</color>
+    <color name="backgroundText_color">    #F1F4D2</color>
+
+    <color name="fragment1_background_elements"> #2B3582</color>
+
+</resources>

@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Escape-War-Net</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="Edit_btn"> Edit</string>
+    <string name="blank_txt"></string>
+    <string name="proceed_btn">Proceed</string>
+
+    <string name="Fragment1_welcome">EscapeWar.net</string>
+    <string name="Fragment2_welcome">Edit your coordinates</string>
+    <string name="back_btn">Back</string>
+    <string name="save_btn">Save</string>
+    <string name="new_name_editTxt">enter x</string>
+    <string name="new_age_editTxt">enter y</string>
+
+
+
+
+
+    <string name="option_select">Chose option</string>
+    <string-array name="beasts">
+        <item>Escape from danger area</item>
+        <item>Find shelter</item>
+        <item>Report a danger</item>
+    </string-array>
+
+
+</resources>
