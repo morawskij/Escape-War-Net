@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 from queue import PriorityQueue
 import math
 
+
+#without saving f_score
+
 directions = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1))
 
 
@@ -12,22 +15,18 @@ class Node:
         self.y = y
         self.walkable = attribute #0-blocked 1-standard 2-shalter
         self.g_score = 0 #real cost
-        self.f_score = 0
         self.parent = None  #to track path
-        
 
     def __lt__(self, other):
-        return self.f_score < other.f_score
+        return self.g_score < other.g_score
 
 class Grid:
     def __init__(self):
-        #exmple setup.
         self.coordinate_min_x=0
-        self.coordinate_max_x=24
+        self.coordinate_max_x=80
         self.coordinate_min_y=0
-        self.coordinate_max_y=15
-        self.node_size = 0.5   
-
+        self.coordinate_max_y=50
+        self.node_size = 0.5
 
         self.coordinate_size_y = self.coordinate_max_y-self.coordinate_min_y
         self.coordinate_size_x=self.coordinate_max_x-self.coordinate_min_x
@@ -44,7 +43,7 @@ class Grid:
         for i in range(self.size_x):
             for j in range(self.size_y):
                 node = self.matrix[i][j]
-                color = 'black' if not node.walkable else 'blue'
+                color = 'red' if not node.walkable else 'blue'
                 plt.gca().add_patch(plt.Rectangle((i, j), 0.5, 0.5, color=color))
         plt.xlim(0, self.size_x)
         plt.ylim(0, self.size_y)
@@ -72,46 +71,37 @@ class Grid:
         return res
     
     def heura(self, v,u):
-        return math.sqrt((v.x - u.x)*(v.x - u.x) + (v.y - u.y)*(v.y - u.y)) ##TODO The idea of heuristic is to
-        #create polygons of danger areas based on machine learning process of satellite images(tank movemen/bombarding areas) and reports of users. 
-        # Then areas inside and arround the danger polygons will have big penaties on edges.
+        return math.sqrt((v.x - u.x)*(v.x - u.x) + (v.y - u.y)*(v.y - u.y))
+
    
     def search(self, start, end):
         q = PriorityQueue()
         start.g_score = 0
-        start.f_score = self.heura(start,end)
-        q.put(start)
-        print(f"x,y = ({end.x},{end.y})")
 
+        q.put((self.heura(start,end),start))
         checked = set()
 
         while not q.empty():
-            curr_cheapest = q.get()
-            if curr_cheapest.x == end.x and curr_cheapest.y ==end.y:
+            (temp,curr_cheapest) = q.get()
+            if curr_cheapest==end:
                 path = self.reconstruct_path(curr_cheapest)
                 return path
 
             checked.add(curr_cheapest)
             for neigh in self.get_possible_moves(curr_cheapest):
-                if not neigh.walkable or neigh in checked:
+                if not neigh.walkable or neigh in checked: 
                     continue
 
                 h_score = self.heura(neigh, end)
-                g_score = curr_cheapest.g_score  +self.heura(neigh,curr_cheapest)
-                f_score = g_score+ h_score        ##TODO The idea of heuristic is to
-                                                  #create polygons of danger areas based on machine learning process of satellite images(tank movemen/bombarding areas) and reports of users. 
-                                                  # Then areas inside and arround the danger polygons will have big penaties on edges.
-                if neigh not in q.queue:
-                        q.put(neigh) 
-                        neigh.parent = curr_cheapest
-
-                if g_score <= neigh.g_score:
+                g_score = curr_cheapest.g_score  +self.heura(curr_cheapest,neigh)##math.sqrt(self.node_size*self.node_size)
+                f_score = g_score+ h_score
+               
+                if neigh not in checked or f_score < neigh.g_score:
                     neigh.g_score = g_score
-                    neigh.parent = curr_cheapest
-                    
-                if f_score <= neigh.f_score:
-                    neigh.f_score= f_score
-                    
+                    neigh.parent = curr_cheapest##change
+                    if neigh not in q.queue:
+                      q.put((f_score,neigh))
+            
         return None  
 
     def reconstruct_path(self, node):
@@ -125,25 +115,19 @@ def visualize_path(grid, path):
         for i in range(grid.size_x):
             for j in range(grid.size_y):
                 node = grid.matrix[i][j]
-                color = 'red' if node.walkable==False else 'blue'
+                color = 'blue' if not node.walkable else 'red'
                 plt.gca().add_patch(plt.Rectangle((i, j), 1, 1, color=color))
-        
         for x, y in path:
             plt.plot(x + 0.5, y+0.5,marker='o',color='black')
-            
-        plt.xlim(0,grid.size_x)
-        plt.ylim(0, grid.size_y)
-        plt.gca().set_aspect('equal', adjustable='box')
-        plt.axis('off')
         plt.show()
 
-grid = Grid()
 
-start = grid.matrix[12][10]
-end = grid.matrix[42][26]
+grid = Grid()
+start = grid.matrix[4][12]
+end = grid.matrix[9][25]
 
 path = grid.search(start, end)
 if path:
     visualize_path(grid,path)
 else:
-    print("Not found :(")
+    print("No track :(")
